@@ -121,6 +121,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				font-weight: bold;
 				color: #FACFAC;
 			}
+			#linkSection{
+			width: 400px;
+				max-width: 400px;
+				max-height: 25px;
+			}
+			#link{
+				overflow: hidden;
+				margin-top: 40px;
+				padding: 5px;
+				border: solid;
+				border-color: #4c88af;
+			}
+			#linkCopy{
+				margin-left:60%;
+				font-size: 50%;
+			}
+			#copyMark{
+				font-size: 250%;
+				margin-top: -55px;
+				margin-left: 340px;
+				position: absolute;
+				transition: opacity 1s ease-out;
+			}
+			.fadeOut {
+				opacity: 0;
+			}
 		</style>
 	</head>
 
@@ -146,8 +172,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				<div id="progressText">0%</div>
 				<div id="progressCRC"></div>
 			</div>
+			<section id="linkSection" onclick="copyToClipboard()">
+			<div hidden id="link" title="CLICK to copy">
+				placeholder
+			</div>
+			<div hidden id="copyMark">
+			👌
+			</div>
+			<div hidden id="linkCopy">
+				CLICK link to copy to clipboard.
+			</div>
+		</section>
 		</div>
-
+		
 		<script>
 			const uploadForm = document.getElementById("uploadForm");
 			const fileInput = document.getElementById("fileInput");
@@ -179,6 +216,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 						if (response.success) {
 							const messageDiv = document.querySelector(".message");
 							messageDiv.innerHTML = `File uploaded successfully. CRC32: ${response.crc32}`;
+							document.getElementById("link").innerText = '<?php echo "https://".$_SERVER['HTTP_HOST']."/uploads/"; ?>' + response.newFileName;
+							document.getElementById("link").hidden = false;
+							document.getElementById("linkCopy").hidden = false;
 						} else {
 							alert("Error uploading file.");
 						}
@@ -194,10 +234,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				const k = 1024;
 				const dm = decimals < 0 ? 0 : decimals;
 				const sizes = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
 				const i = Math.floor(Math.log(bytes) / Math.log(k));
 
 				return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 			}
+			
+			function copyToClipboard() {
+			var copyMark = 	document.getElementById("copyMark");
+				copyMark.hidden = false;
+				copyMark.classList.remove("fadeOut");
+				copyMark.style.display = ""; 
+				navigator.clipboard.writeText(document.getElementById("link").innerText)
+					.then(() => {
+						console.log('Text successfully copied to clipboard');
+						fadeOutCopyMark();
+					})
+					.catch(err => {
+						console.error('Unable to copy text to clipboard', err);
+					});
+			}
+			
+			function fadeOutCopyMark() {
+				var copyMark = 	document.getElementById("copyMark");
+				copyMark.hidden = false;
+				copyMark.classList.remove("fadeOut");
+				copyMark.style.display = ""; 
+				document.getElementById("copyMark").style.display = "flex";
+				copyMark.classList.add("fadeOut");
+
+				// Optional: Add a delay before removing the element
+				setTimeout(function () {
+					copyMark.style.display = "none";
+				}, 1000); // Adjust the delay (in milliseconds) as needed
+        }
 		</script>
 	</body>
 
