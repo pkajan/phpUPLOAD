@@ -1,6 +1,10 @@
 <?php
 $directoryName = "uploads";
 
+function removeWeirdThings($string) {
+	return preg_replace("/[^a-zA-Z0-9\.\-]+/", "_", $string);
+}
+
 if (!is_dir($directoryName)) {
 	if (mkdir($directoryName)) {
 		//created_successfully
@@ -31,11 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$fileParts = pathinfo($fileName);
 
 		// Check if the file with the same name already exists
-		$newFileName = $fileParts['filename'] . '_' . $crc32 . '.' . $fileParts['extension'];
+		$newFileName = removeWeirdThings($fileParts['filename'] . '_' . $crc32 . '.') . $fileParts['extension'];
 		$changedName = false;
 		while (file_exists($uploadDir . $newFileName)) {
 			// If a file with the same name exists, append a dateTime to the filename
-			$newFileName = $fileParts['filename'] . '_' . date("Ymd_His") . '_' . $crc32 . '.' . $fileParts['extension'];
+			$newFileName = removeWeirdThings($fileParts['filename'] . '_' . date("Ymd_His") . '_' . $crc32 . '.') . $fileParts['extension'];
 			$changedName = true;
 		}
 
@@ -121,8 +125,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				font-weight: bold;
 				color: #FACFAC;
 			}
+			
 			#linkSection{
-			width: 400px;
+				width: 400px;
 				max-width: 400px;
 				max-height: 25px;
 			}
@@ -147,6 +152,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			.fadeOut {
 				opacity: 0;
 			}
+			#drop-zone {
+				width: 150px;
+				height: 75px;
+				border: 2px dashed #ccc;
+				text-align: center;
+				line-height: 75px;
+				cursor: pointer;
+				margin: 20px auto;
+			}
 		</style>
 	</head>
 
@@ -162,6 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		</div>
 		<div class="container">
 			<h2>Upload a file with CRC Control</h2>
+					<div id="drop-zone">Drop files here</div>
 			<form id="uploadForm" enctype="multipart/form-data" method="post">
 				<input type="file" id="fileInput" name="file" required>
 				<button type="submit" id="uploadButton" name="submit">Upload</button>
@@ -267,10 +282,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				setTimeout(function () {
 					copyMark.style.display = "none";
 				}, 1000); // Adjust the delay (in milliseconds) as needed
-        }
+		}
+
+	// Add drag-and-drop functionality
+	const dropZone = document.getElementById('drop-zone');
+
+	dropZone.addEventListener('dragover', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		dropZone.style.border = '2px dashed #333';
+	});
+
+	dropZone.addEventListener('dragleave', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		dropZone.style.border = '2px dashed #ccc';
+	});
+
+	dropZone.addEventListener('drop', function (e) {
+	e.preventDefault();
+		e.stopPropagation();
+		dropZone.style.border = '2px dashed #ccc';
+
+		const file = e.dataTransfer.files[0];
+		if (file) {
+			console.log('File dropped:', file);
+			fileInput.files = e.dataTransfer.files;
+			fileInput.dispatchEvent(new Event('change'));
+		}
+	});
 		</script>
 	</body>
-
 	</html>
 	<?php
 }
