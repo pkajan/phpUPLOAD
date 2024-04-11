@@ -187,7 +187,7 @@ else {
     </div>
     <div class="container">
       <h2>Upload a file with CRC Control</h2>
-      <div id="drop-zone">Drop files here</div>
+      <div id="drop-zone">Drop file here</div>
       <form id="uploadForm" enctype="multipart/form-data" method="post">
         <input type="file" id="fileInput" name="file" required>
         <button type="submit" id="uploadButton" name="submit">Upload</button>
