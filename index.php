@@ -164,7 +164,7 @@ else {
       }
 
       #drop-zone {
-        width: 150px;
+        width: 350px;
         height: 75px;
         border: 2px dashed #ccc;
         text-align: center;
@@ -187,10 +187,10 @@ else {
     </div>
     <div class="container">
       <h2>Upload a file with CRC Control</h2>
-      <div id="drop-zone">Drop file here</div>
+      <div id="drop-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">Drop file here</div>
       <form id="uploadForm" enctype="multipart/form-data" method="post">
-        <input type="file" id="fileInput" name="file" required>
-        <button type="submit" id="uploadButton" name="submit">Upload</button>
+        <input type="file" id="uploadButton" name="file" required>
+        <button id="uploadForm-submit" type="submit" name="submit">Upload</button>
       </form>
       <div class="message"></div>
       <div id="progress">
@@ -213,7 +213,7 @@ else {
 
     <script>
       const uploadForm = document.getElementById("uploadForm");
-      const fileInput = document.getElementById("fileInput");
+      const fileInput = document.getElementById("drop-zone");
       const uploadButton = document.getElementById("uploadButton");
       const progressBar = document.getElementById("bar");
       const progressText = document.getElementById("progressText");
@@ -314,15 +314,22 @@ else {
         e.preventDefault();
         e.stopPropagation();
         dropZone.style.border = '2px dashed #ccc';
-
-        const file = e.dataTransfer.files[0];
-        if (file) {
-          console.log('File dropped:', file);
-          fileInput.files = e.dataTransfer.files;
-          fileInput.dispatchEvent(new Event('change'));
-          document.getElementById('uploadForm').querySelector('button[type="submit"]').click();
-        }
       });
+/*********************************************************************************** */
+      function handleDrop(event) {
+        event.preventDefault();
+        const files = event.dataTransfer.files;
+        if (files.length > 0) {
+          const fileInput = document.getElementById('uploadButton');
+          fileInput.files = files;
+		  document.getElementById('uploadForm').querySelector('button[type="submit"]').click();
+        }
+      }
+
+      function handleDragOver(event) {
+        event.preventDefault();
+      }
+
     </script>
   </body>
 
@@ -330,3 +337,4 @@ else {
   <?php
 }
 ?>
+
